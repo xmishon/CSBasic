@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+// Разработчик: Змеевский Михаил
 namespace HomeWork7
 {
     public partial class Form1 : Form

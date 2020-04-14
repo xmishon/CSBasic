@@ -1,5 +1,6 @@
 ﻿using System;
 
+// Разработчик: Змеевский Михаил
 namespace HomeWork7
 {
     class GameObject
