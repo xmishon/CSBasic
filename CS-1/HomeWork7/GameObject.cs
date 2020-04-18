@@ -3,19 +3,26 @@
 // Разработчик: Змеевский Михаил
 namespace HomeWork7
 {
-    class GameObject
+    [Serializable]
+    public class GameObject
     {
         private Cell[][] cells;
         private int fieldSize = 8;
         public delegate void FinishGame();
         public int MinesCount { get; private set; }
+        private int seconds;
+
+        public GameObject() { }
 
         public GameObject(int fieldSize)
         {
             this.fieldSize = fieldSize;
             MinesCount = 0;
+            seconds = 0;
+            InitializeCells();
         }
 
+        [Serializable]
         private struct Cell
         {
             public bool isMine;
@@ -98,14 +105,7 @@ namespace HomeWork7
 
             int minesCounter = 0;
             // Считаем количество мин в ячейках вокруг
-            checkCell(x - 1, y - 1, ref minesCounter);
-            checkCell(x, y - 1, ref minesCounter);
-            checkCell(x + 1, y - 1, ref minesCounter);
-            checkCell(x + 1, y, ref minesCounter);
-            checkCell(x + 1, y + 1, ref minesCounter);
-            checkCell(x, y + 1, ref minesCounter);
-            checkCell(x - 1, y + 1, ref minesCounter);
-            checkCell(x - 1, y, ref minesCounter);
+            checkAround(x, y, ref minesCounter);
 
             return minesCounter;
         }
@@ -114,6 +114,17 @@ namespace HomeWork7
         {
             cells[x][y].isFlag = !cells[x][y].isFlag;
             return cells[x][y].isFlag;
+        }
+
+        public int IncrementGameTime()
+        {
+            seconds++;
+            return seconds;
+        }
+
+        public int GetGameTime()
+        {
+            return seconds;
         }
 
         /// <summary>
@@ -130,6 +141,30 @@ namespace HomeWork7
                 if (cells[x][y].isMine)
                     counter++;
             }
+        }
+
+        private void checkAround(int x, int y, ref int counter)
+        {
+            checkCell(x - 1, y - 1, ref counter);
+            checkCell(x, y - 1, ref counter);
+            checkCell(x + 1, y - 1, ref counter);
+            checkCell(x + 1, y, ref counter);
+            checkCell(x + 1, y + 1, ref counter);
+            checkCell(x, y + 1, ref counter);
+            checkCell(x - 1, y + 1, ref counter);
+            checkCell(x - 1, y, ref counter);
+        }
+
+        public int GetInfo(int x, int y)
+        {
+            if (cells[x][y].isOpened)
+            {
+                int minesCounter = 0;
+                checkAround(x, y, ref minesCounter);
+                return minesCounter;
+            }
+            else if (cells[x][y].isFlag) return -1;
+            else return -2;
         }
 
     }

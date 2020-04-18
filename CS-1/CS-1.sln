@@ -27,9 +27,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lesson6", "Lesson6", "{C81F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeWork6", "HomeWork6\HomeWork6.csproj", "{602DD98B-58FF-47FD-B628-A28469B7ED5C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lesson7", "Lesson7", "{8C2D514D-EF53-4F72-AEBB-05297AB8D4E4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lesson8", "Lesson8", "{8C2D514D-EF53-4F72-AEBB-05297AB8D4E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeWork7", "HomeWork7\HomeWork7.csproj", "{E8D7842D-3B5F-47D1-ACBE-AD890A829CCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeWork8", "HomeWork7\HomeWork8.csproj", "{E8D7842D-3B5F-47D1-ACBE-AD890A829CCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

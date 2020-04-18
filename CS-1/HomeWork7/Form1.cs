@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Xml.Serialization;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 // Разработчик: Змеевский Михаил
 namespace HomeWork7
@@ -67,29 +65,56 @@ namespace HomeWork7
             graphics.FillRectangle(brush, rect);
         }
 
+        private void RedrawCells()
+        {
+            for (int i = 0; i < FIELD_SIZE; i++)
+            {
+                for (int j = 0; j < FIELD_SIZE; j++)
+                {
+                    int result = game.GetInfo(i, j);
+                    if(result >= 0)
+                    {
+                        DrawCell(new SolidBrush(Color.LightGray), i, j, result);
+                    } else if(result == -1) {
+                        DrawCell(new SolidBrush(Color.Green), i, j);
+                        SetMinesCounter(--flagsCounter);
+                    }
+                }
+            }
+        }
+
         private void buttonStart_Click(object sender, EventArgs e)
+        {
+            StartNewGame();
+        }
+
+        private void StartNewGame(GameObject game)
         {
             isClickable = true;
             DrawField();
-            game = new GameObject(FIELD_SIZE);
-            game.InitializeCells();
+            this.game = game;
             timer.Stop();
             try
             {
                 timer.Tick -= TickerHandler;
-            } catch (Exception exc)
+            }
+            catch (Exception exc)
             {
                 label1.Text = "Ошибка сборса таймера";
             }
             flagsCounter = game.MinesCount;
             SetMinesCounter(flagsCounter);
-            
+
             labelTime.Text = "000";
             timer.Enabled = true;
             timer.Interval = 1000;
             timer.Start();
             timer.Tick += TickerHandler;
+        }
 
+        private void StartNewGame()
+        {
+            StartNewGame(new GameObject(FIELD_SIZE));
         }
 
         private void SetMinesCounter(int count)
@@ -101,7 +126,7 @@ namespace HomeWork7
 
         private void TickerHandler(object sender, EventArgs e)
         {
-            labelTime.Text = (int.Parse(labelTime.Text) + 1).ToString();
+            labelTime.Text = game.IncrementGameTime().ToString();
             if (labelTime.Text.Length < 2) labelTime.Text = "00" + labelTime.Text;
             if (labelTime.Text.Length < 3) labelTime.Text = "0" + labelTime.Text;
         }
@@ -165,15 +190,18 @@ namespace HomeWork7
         {
             if (x >= 0 && x < FIELD_SIZE && y >= 0 && y < FIELD_SIZE)
             {
-                if (game.SetFlag(x, y))
+                if (game.GetInfo(x, y) < 0) // означает, что ячейка закрыта. Флаги ставим только на закрытые ячейки
                 {
-                    DrawCell(new SolidBrush(Color.Green), x, y);
-                    SetMinesCounter(--flagsCounter);
-                }
-                else
-                {
-                    DrawCell(new SolidBrush(Color.Gray), x, y);
-                    SetMinesCounter(++flagsCounter);
+                    if (game.SetFlag(x, y))
+                    {
+                        DrawCell(new SolidBrush(Color.Green), x, y);
+                        SetMinesCounter(--flagsCounter);
+                    }
+                    else
+                    {
+                        DrawCell(new SolidBrush(Color.Gray), x, y);
+                        SetMinesCounter(++flagsCounter);
+                    }
                 }
             }
         }
@@ -188,6 +216,8 @@ namespace HomeWork7
         private void оРазработчикеToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Реализация классический игры сапёр для Windows в качестве домашнего задания\n" +
+                "В качестве домашнего задания N8 добавил в игру возможность сохранить и загрузить игру\n" +
+                "Для реализации сохранения и загрузки была использована сериализация\n" +
                 "Разработчик: Змеевский Михаил");
         }
 
@@ -207,6 +237,36 @@ namespace HomeWork7
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void продолжитьПредСохранениеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream stream = null;
+            try
+            {
+                stream = new FileStream("save.mzm", FileMode.Open, FileAccess.Read);
+                IFormatter formatter = new BinaryFormatter();
+                game = (GameObject) formatter.Deserialize(stream);
+                StartNewGame(game);
+                RedrawCells();
+            } catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка чтения сохранения.\nУбедитесь, что в сохраняли игру ранее.\n" + ex.Message);
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+        }
+
+        private void сохранитьИгруToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            timer.Stop();
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream("save.mzm", FileMode.Create, FileAccess.Write);
+            formatter.Serialize(stream, game);
+            stream.Close();
         }
     }
 }
